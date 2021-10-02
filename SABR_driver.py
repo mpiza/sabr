@@ -11,32 +11,29 @@ import sabr_calibration
 
 
 def main(): 
-    #A good fit can be obtained for any 0<=beta<=1. Often beta=0,1/2 or beta=1
-    #is choosen, depending on the market.
-    beta = 1
-    #The current forward price
+     
+    beta = 0.5
     Fwd =  0.04
-    #The time to the expiry of the option
     Texp = 5
-    #The tenor of the option
     tenor = 1
+    
     #A list of market volatilities at strikes corropsponding to strikes_in_bps below. 
     #sigmas = np.array([0.4040, 0.3541, 0.3218, 0.3107, 0.3048, 0.2975, 0.2923, 0.2873, 0.2870])
-    sigmas = np.array([0.4,0.35, 0.33, 0.32, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3,0.3])
+    sigmas = np.array([0.4,0.35, 0.33, 0.32, 0.3, 0.1, 0.3, 0.4, 0.5, 0.6,0.7])
     #The 'At the money volatility', corrosponding to a strike equal to the current forward price.
     #atm_sigma = 0.3048
-    atm_sigma = 0.3
+    atm_sigma = 0.1
     #A list of strikes in bps (=0.0001) corrosponding to volatilites in sigmas
     strikes_in_bps = np.array([-200, -150,-100,-50,-25,0,25,50,100,150,200])
     #An inital guess of the parameters alpha, nu and rho.
-    guess = [0.01, 1,-0.1]
-    
-    #calculating the actual strikes from f and strikes_in_bps
+    guess = [0.4, 3, 0.6]
     strikes = Fwd + strikes_in_bps*0.0001
-    #Calling the SABR_calibration function defined below to return the parameters.
-    alpha, nu, rho = sabr_calibration.SABR_calibration_fix_atm(Fwd, Texp, atm_sigma, beta, strikes, sigmas, guess)
     
-    #This nextsection of code simply draws a plot.
+     
+    alpha, nu, rho, res2 = sabr_calibration.SABR_calibration_fix_atm(Fwd, Texp, atm_sigma, beta, strikes, sigmas, guess)
+    print ("mse:", np.sqrt(res2))
+    
+    #PLOT
     Ks_in_bps = np.linspace(-200,200,60)
     Ks = Fwd + Ks_in_bps*0.0001
     vols_from_Ks = sabr_formula.SABR1_vols(Ks,Fwd,Texp,alpha,beta,nu,rho)

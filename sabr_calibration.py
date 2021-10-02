@@ -35,14 +35,22 @@ def SABR_calibration_fix_atm(Fwd, Texp, sigma_atm, beta, strikes, vols,guess):
         alpha = atm_sigma_to_alpha(Fwd,Texp,sigma_atm,beta,nu,rho)
         return  sabr_formula.SABR1_vols(K,Fwd,Texp,alpha,beta,nu,rho)
      
-    opt_parameters, pcov = curve_fit(func_to_optimize, strikes, vols, p0 = (guess[1],guess[2]), maxfev=10000, method = "trf")
-      
-    nu = opt_parameters[0]
+    method = 'lm'  #'trf'    
+    opt_parameters, pcov = curve_fit(func_to_optimize, strikes, vols, p0 = (guess[1],guess[2]), maxfev=10000, method = method)
+    print(pcov)  
+    
+    
+    nu = opt_parameters[0] 
     rho = opt_parameters[1]
     alpha = atm_sigma_to_alpha(Fwd,Texp,sigma_atm,beta,nu,rho)
+ 
+    res = sabr_formula.SABR1_vols(strikes,Fwd,Texp,alpha,beta,nu,rho) - vols
+    print(res)
+    res2 = np.sum(res**2)/res.size
+    
     
 #    nu = 0.00001;
 #    rho = 0.000001;
 #    alpha = 0.3
     
-    return [alpha, nu, rho]
+    return [alpha, nu, rho, res2]
