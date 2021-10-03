@@ -19,21 +19,21 @@ strikes = Fwd + strikes_in_bps*0.0001
 print(strikes)
 
 alpha0 = 0.2
-beta0 = 0.9
+beta0 = 0.01
 nu0 = 0.1
 rho0 = -0.5
-shift0 = 0
-
-#vols = sabr_formula.SABR1_vols(strikes,Fwd,Texp,alpha0,beta0,nu0,rho0)
-
-#print("LogNormal Vols", vols)
-
-vols = sabr_formula.SABR_normal_vols_shifted(strikes,Fwd,Texp,alpha0,beta0,nu0,rho0,shift0)
+ 
+#============ 
+vols = sabr_formula.SABR_normal_vols(strikes,Fwd,Texp,alpha0,beta0,nu0,rho0)
 print("Normal vols: ", vols)
+#============
 
 fig, ax = plt.subplots()
 plt.subplots_adjust(left=0.25, bottom=0.25)
+
+#=====================
 ax.set_ylim(0, 2*alpha0*(Fwd**(beta0))) 
+#======================
 #ax.set_ylim(0, 2*alpha0*(Fwd**(beta0-1)))
 
 
@@ -56,10 +56,11 @@ def update(val):
     beta = sbeta.val
     nu = snu.val
     rho = srho.val
-    ax.set_ylim(0, 2*alpha*(Fwd**(beta - 1))) 
-#    ax.set_ylim(0, 2*alpha*(Fwd**(beta-1)))
-    
-    l.set_ydata(sabr_formula.SABR1_vols(strikes,Fwd,Texp,alpha,beta,nu,rho))
+#==============
+    ax.set_ylim(0, 2*alpha*(Fwd**(beta))) 
+    l.set_ydata(sabr_formula.SABR1_normal_vols(strikes,Fwd,Texp,alpha,beta,nu,rho))
+#============
+
     fig.canvas.draw_idle()
 
 salpha.on_changed(update)

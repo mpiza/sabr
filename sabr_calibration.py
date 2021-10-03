@@ -9,6 +9,14 @@ import sabr_formula
 import numpy as np
 from scipy.optimize import curve_fit
 
+ 
+     
+def atm_sigma_to_alpha_shifted(Fwd,Texp,sigma_atm,beta,nu,rho, shift):
+    
+    r = atm_sigma_to_alpha(Fwd + shift,Texp,sigma_atm + shift,beta,nu,rho)
+    
+    return r
+
 def atm_sigma_to_alpha(Fwd,Texp,sigma_atm,beta,nu,rho):
     '''Returns alpha given forward, ATM volatility,expiry (Texp),
     beta, nu and rho.  Solves  cubic equation for alpha, equation (2.18) 
@@ -24,6 +32,12 @@ def atm_sigma_to_alpha(Fwd,Texp,sigma_atm,beta,nu,rho):
     r = np.roots(coeffs)    #find the roots of the cubic equation
     
     return r[(r.imag==0) & (r.real>=0)].real.min() 
+
+def SABR_calibration_fix_atm_shifted(Fwd, Texp, sigma_atm, beta, strikes, vols,guess, shift):
+    
+   r =  SABR_calibration_fix_atm(Fwd + shift, Texp, sigma_atm + shift, beta, strikes, vols,guess)
+    
+   return r;
 
 def SABR_calibration_fix_atm(Fwd, Texp, sigma_atm, beta, strikes, vols,guess):
     ''' Returns the parameters alpha, nu and rho given beta, 

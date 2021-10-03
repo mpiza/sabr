@@ -13,16 +13,17 @@ import sabr_calibration
 def main(): 
      
     beta = 0.5
-    Fwd =  0.04
+    Fwd =  0.025
     Texp = 5
     tenor = 1
+    shift = 0.0
     
     #A list of market volatilities at strikes corropsponding to strikes_in_bps below. 
     #sigmas = np.array([0.4040, 0.3541, 0.3218, 0.3107, 0.3048, 0.2975, 0.2923, 0.2873, 0.2870])
-    sigmas = np.array([0.4,0.35, 0.33, 0.32, 0.3, 0.1, 0.3, 0.4, 0.5, 0.6,0.7])
+    sigmas = np.array([0.4,0.35, 0.33, 0.32, 0.3, 0.3, 0.3, 0.4, 0.5, 0.6,0.7])
     #The 'At the money volatility', corrosponding to a strike equal to the current forward price.
     #atm_sigma = 0.3048
-    atm_sigma = 0.1
+    atm_sigma = 0.3
     #A list of strikes in bps (=0.0001) corrosponding to volatilites in sigmas
     strikes_in_bps = np.array([-200, -150,-100,-50,-25,0,25,50,100,150,200])
     #An inital guess of the parameters alpha, nu and rho.
@@ -30,13 +31,14 @@ def main():
     strikes = Fwd + strikes_in_bps*0.0001
     
      
-    alpha, nu, rho, res2 = sabr_calibration.SABR_calibration_fix_atm(Fwd, Texp, atm_sigma, beta, strikes, sigmas, guess)
+    alpha, nu, rho, res2 = sabr_calibration.SABR_calibration_fix_atm_shifted(Fwd, Texp, atm_sigma,
+                                                                             beta, strikes, sigmas, guess, shift)
     print ("mse:", np.sqrt(res2))
     
     #PLOT
     Ks_in_bps = np.linspace(-200,200,60)
     Ks = Fwd + Ks_in_bps*0.0001
-    vols_from_Ks = sabr_formula.SABR1_vols(Ks,Fwd,Texp,alpha,beta,nu,rho)
+    vols_from_Ks = sabr_formula.SABR1_vols_shifted(Ks,Fwd,Texp,alpha,beta,nu,rho, shift)
     textbox = "\n".join((r"$\alpha=$"+f"{round(alpha,6)}",r"$\beta=$"+f"{beta}",
                         r"$\rho=$"+f"{round(rho,6)}", r"$\nu=$"+f"{round(nu,6)}"))
     fig, ax = plt.subplots()
